@@ -4,7 +4,7 @@ library(tidyverse)
 
 # two-group comparison ----------------------------------------------------
 
-df_fl <- read_csv("data_raw/data_fish_length.csv")
+df_fl <- read_csv("/Users/sophiaronan/Desktop/biostats_2024/data_raw/data_fish_length.csv")
 
 # group mean and sd
 df_fl_mu <- df_fl %>% 
@@ -81,6 +81,39 @@ t_value <- (v_mu[1] - v_mu[2]) / sqrt(var_p * ((1 / v_n[1]) + (1 / v_n[2])))
 # they are
 
 
+# null hypothesis -------------------------------------------------------
 
+# produce 500 values from -5 to 5 with equal interval
+x <- seq(-5, 5, length = 500)
+
+# probability density of t-statistics with df = sum(v_n) - 2
+y <- dt(x, df = sum(v_n) - 2)
+
+# draw figure
+tibble(x, y) %>% 
+        ggplot(aes(x = x,
+                   y = y)) +
+        geom_line() +
+        labs(y = "Probability density",
+             x = "t-statistic")
+# draw entire range
+tibble(x, y) %>% 
+        ggplot(aes(x = x,
+                   y = y)) +
+        geom_line() +
+        geom_vline(xintercept = t_value,
+                   color = "blue") + # t_value is the observed t_value
+        geom_vline(xintercept = abs(t_value),
+                   color = "blue") + # t_value is the observed t_value
+        labs(y = "Probability density",
+             x = "t-statistic") 
+# calculate area under the curve from -infinity to t_value
+pr_below <- pt(q = t_value, df = sum(v_n) - 2)
+
+# calculate area under the curve from abs(t_value) to infinity
+pr_above <- 1 - pt(q = abs(t_value), df = sum(v_n) - 2)
+# p_value
+p_value <- pr_below + pr_above
+print(p_value)
 
 
